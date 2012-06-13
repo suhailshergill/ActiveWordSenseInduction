@@ -1,10 +1,8 @@
 package edu.ucla.sspace
 
 import edu.ucla.sspace.basis.StringBasisMapping
-import edu.ucla.sspace.matrix.Matrices
-import edu.ucla.sspace.matrix.MatrixIO
-import edu.ucla.sspace.matrix.MatrixIO.Format
 import edu.ucla.sspace.vector.CompactSparseVector
+import edu.ucla.sspace.vector.VectorIO
 
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.io.Source
@@ -26,17 +24,13 @@ object ExtractWordsiContexts {
             v
         }
 
-        val docs = Source.fromFile(args(1))
-                         .getLines
-                         .mkString("\n")
-                         .split("\\n\\n")
-        val contexts = docs.map(_.split("\n").tail)
-                           .map(_.map(_.split("\\s+")(1)))
-                           .map(_.map(basis.getDimension)
-                                 .filter(_>=0))
-                           .map(toVector)
+        val contexts = Source.fromFile(args(1))
+                             .getLines
+                             .map(_.split("\\s+")
+                                   .map(basis.getDimension)
+                                   .filter(_>=0))
+                             .map(toVector)
 
-        MatrixIO.writeMatrix(Matrices.asSparseMatrix(contexts.toList),
-                             args(2), Format.SVDLIBC_SPARSE_TEXT)
+        VectorIO.writeVectors(contexts.toList, args(2));
     }
 }
